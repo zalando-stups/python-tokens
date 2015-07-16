@@ -39,12 +39,13 @@ def get(token_name):
                 'scope': ' '.join(token['scopes'])
                 }
 
-        r = requests.post(CONFIG['url'], data=json.dumps(body),
-                          auth=(client_data.get('client_id'), client_data.get('client_secret')),
-                          headers={'Content-Type': 'application/json'})
+        r = requests.post(CONFIG['url'], data=body,
+                          auth=(client_data.get('client_id'), client_data.get('client_secret')))
+        r.raise_for_status()
         data = r.json()
         token['data'] = data
         token['expires_at'] = time.time() + data.get('expires_in')
         token['access_token'] = data.get('access_token')
 
+    access_token = token.get('access_token')
     return access_token
