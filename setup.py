@@ -31,7 +31,7 @@ setup(
     name='stups-tokens',
     packages=find_packages(),
     version=version,
-    description='Tokens',
+    description='Python library to manage OAuth access tokens',
     long_description=open('README.rst').read(),
     author='Henning Jacobs',
     author_email='henning.jacobs@zalando.de',
