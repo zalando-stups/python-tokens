@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+import time
 
 
 CONFIG = {'url': os.environ.get('OAUTH_ACCESS_TOKEN_URL'),
@@ -25,11 +26,11 @@ def start():
 def get(token_name):
     token = TOKENS[token_name]
     access_token = token.get('access_token')
-    if not access_token:
+    if not access_token or time.time() > token['expires_at'] - 20*60:
         path = CONFIG['dir']
         with open(os.path.join(path, 'user.json')) as fd:
             user_data = json.load(fd)
-        with open(os.path.join(path, 'clien.json')) as fd:
+        with open(os.path.join(path, 'client.json')) as fd:
             client_data = json.load(fd)
         body = {
                 'grant_type': 'password',
@@ -43,8 +44,7 @@ def get(token_name):
                           headers={'Content-Type': 'application/json'})
         data = r.json()
         token['data'] = data
+        token['expires_at'] = time.time() + data.get('expires_in')
         token['access_token'] = data.get('access_token')
 
-
     return access_token
-

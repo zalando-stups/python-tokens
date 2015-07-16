@@ -6,7 +6,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-version = '0.1'
+version = '0.2'
 
 
 class PyTest(TestCommand):
@@ -33,7 +33,8 @@ setup(
     version=version,
     description='Tokens',
     long_description=open('README.rst').read(),
-    author='Zalando SE',
+    author='Henning Jacobs',
+    author_email='henning.jacobs@zalando.de',
     url='https://github.com/zalando-stups/python-tokens',
     license='Apache License Version 2.0',
     install_requires=['requests'],
