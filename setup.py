@@ -6,7 +6,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-version = '0.3'
+__version__ = '0.3'
 
 
 class PyTest(TestCommand):
@@ -30,7 +30,7 @@ class PyTest(TestCommand):
 setup(
     name='stups-tokens',
     packages=find_packages(),
-    version=version,
+    version=__version__,
     description='Python library to manage OAuth access tokens',
     long_description=open('README.rst').read(),
     author='Henning Jacobs',
