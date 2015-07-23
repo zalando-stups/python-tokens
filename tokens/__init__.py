@@ -3,11 +3,19 @@ import os
 import requests
 import time
 
+ONE_YEAR = 3600*24*365
 
 CONFIG = {'url': os.environ.get('OAUTH_ACCESS_TOKEN_URL'),
           'dir': os.environ.get('CREDENTIALS_DIR')}
 
 TOKENS = {}
+
+
+def init_fixed_tokens_from_env():
+    env_val = os.environ.get('OAUTH2_ACCESS_TOKENS', '')
+    for part in env_val.split(','):
+        key, sep, val = part.partition('=')
+        TOKENS[key] = {'access_token': val, 'expires_at': time.time() + ONE_YEAR}
 
 
 def configure(**kwargs):
@@ -16,6 +24,7 @@ def configure(**kwargs):
 
 def manage(token_name, scopes):
     TOKENS[token_name] = {'scopes': scopes}
+    init_fixed_tokens_from_env()
 
 
 def start():
