@@ -2,6 +2,26 @@
 Python Tokens
 =============
 
+.. image:: https://travis-ci.org/zalando-stups/python-tokens.svg?branch=master
+   :target: https://travis-ci.org/zalando-stups/python-tokens
+   :alt: Build Status
+
+.. image:: https://coveralls.io/repos/zalando-stups/python-tokens/badge.svg
+   :target: https://coveralls.io/r/zalando-stups/python-tokens
+   :alt: Code Coverage
+
+.. image:: https://img.shields.io/pypi/dw/stups-tokens.svg
+   :target: https://pypi.python.org/pypi/stups-tokens/
+   :alt: PyPI Downloads
+
+.. image:: https://img.shields.io/pypi/v/stups-tokens.svg
+   :target: https://pypi.python.org/pypi/stups-tokens/
+   :alt: Latest PyPI version
+
+.. image:: https://img.shields.io/pypi/l/stups-tokens.svg
+   :target: https://pypi.python.org/pypi/stups-tokens/
+   :alt: License
+
 A Python library that keeps OAuth 2.0 service access tokens in memory for your usage.
 
 Installation
@@ -46,3 +66,14 @@ This allows testing applications using the library locally with personal OAuth2 
     $ MY_TOKEN=$(zign token -n mytok)
     $ export OAUTH2_ACCESS_TOKENS=mytok=$MY_TOKEN
     $ ./myapp.py # start my local Python app using the tokens library
+
+
+Releasing
+=========
+
+Uploading a new version to PyPI:
+
+.. code-block:: bash
+
+    $ ./release.sh <NEW-VERSION>
+
