@@ -14,6 +14,22 @@ CONFIG = {'url': os.environ.get('OAUTH_ACCESS_TOKEN_URL'),
 TOKENS = {}
 
 
+class ConfigurationError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return 'Configuration error: {}'.format(self.msg)
+
+
+class InvalidCredentialsError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return 'Invalid OAuth credentials: {}'.format(self.msg)
+
+
 def init_fixed_tokens_from_env():
     env_val = os.environ.get('OAUTH2_ACCESS_TOKENS', '')
     for part in filter(None, env_val.split(',')):
@@ -36,6 +52,24 @@ def start():
     pass
 
 
+def read_credentials(path):
+    user_path = os.path.join(path, 'user.json')
+    try:
+        with open(user_path) as fd:
+            user_data = json.load(fd)
+    except Exception as e:
+        raise InvalidCredentialsError('Failed to read {}: {}'.format(user_path, e))
+
+    client_path = os.path.join(path, 'client.json')
+    try:
+        with open(client_path) as fd:
+            client_data = json.load(fd)
+    except Exception as e:
+        raise InvalidCredentialsError('Failed to read {}: {}'.format(client_path, e))
+
+    return user_data, client_data
+
+
 def refresh(token_name):
     logger.info('Refreshing access token "%s"..', token_name)
     token = TOKENS[token_name]
@@ -43,20 +77,22 @@ def refresh(token_name):
     url = CONFIG['url']
 
     if not url:
-        raise Exception('Missing OAuth access token URL. ' +
-                        'Either set OAUTH_ACCESS_TOKEN_URL or use tokens.configure(url=..).')
+        raise ConfigurationError('Missing OAuth access token URL. ' +
+                                 'Either set OAUTH_ACCESS_TOKEN_URL or use tokens.configure(url=..).')
 
-    with open(os.path.join(path, 'user.json')) as fd:
-        user_data = json.load(fd)
-    with open(os.path.join(path, 'client.json')) as fd:
-        client_data = json.load(fd)
-    body = {'grant_type': 'password',
-            'username': user_data.get('application_username'),
-            'password': user_data.get('application_password'),
-            'scope': ' '.join(token['scopes'])}
+    user_data, client_data = read_credentials(path)
 
-    r = requests.post(url, data=body,
-                      auth=(client_data.get('client_id'), client_data.get('client_secret')))
+    try:
+        body = {'grant_type': 'password',
+                'username': user_data['application_username'],
+                'password': user_data['application_password'],
+                'scope': ' '.join(token['scopes'])}
+
+        auth = (client_data['client_id'], client_data['client_secret'])
+    except KeyError as e:
+        raise InvalidCredentialsError('Missing key: {}'.format(e))
+
+    r = requests.post(url, data=body, auth=auth)
     r.raise_for_status()
     data = r.json()
     token['data'] = data
