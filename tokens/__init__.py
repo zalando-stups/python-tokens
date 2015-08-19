@@ -8,7 +8,7 @@ logger = logging.getLogger('tokens')
 
 ONE_YEAR = 3600*24*365
 
-CONFIG = {'url': os.environ.get('OAUTH_ACCESS_TOKEN_URL'),
+CONFIG = {'url': os.environ.get('OAUTH2_ACCESS_TOKEN_URL', os.environ.get('OAUTH_ACCESS_TOKEN_URL')),
           'dir': os.environ.get('CREDENTIALS_DIR', '')}
 
 TOKENS = {}
@@ -78,7 +78,7 @@ def refresh(token_name):
 
     if not url:
         raise ConfigurationError('Missing OAuth access token URL. ' +
-                                 'Either set OAUTH_ACCESS_TOKEN_URL or use tokens.configure(url=..).')
+                                 'Either set OAUTH2_ACCESS_TOKEN_URL or use tokens.configure(url=..).')
 
     user_data, client_data = read_credentials(path)
 
