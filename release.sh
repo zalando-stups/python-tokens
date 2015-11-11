@@ -12,12 +12,12 @@ git --version
 
 version=$1
 
-sed -i "s/__version__ = .*/__version__ = '${version}'/" setup.py
+sed -i "s/__version__ = .*/__version__ = '${version}'/" */__init__.py
 python3 setup.py clean
 python3 setup.py test
 python3 setup.py flake8
 
-git add setup.py
+git add */__init__.py
 
 git commit -m "Bumped version to $version"
 git push

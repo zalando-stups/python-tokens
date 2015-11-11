@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-__version__ = '0.7'
+
+def read_version(package):
+    with open(os.path.join(package, '__init__.py'), 'r') as fd:
+        for line in fd:
+            if line.startswith('__version__ = '):
+                return line.split()[-1].strip().strip("'")
+
+
+__version__ = read_version('tokens')
 
 
 class PyTest(TestCommand):

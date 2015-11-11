@@ -4,6 +4,8 @@ import os
 import requests
 import time
 
+__version__ = '0.8'
+
 logger = logging.getLogger('tokens')
 
 ONE_YEAR = 3600*24*365
