@@ -46,6 +46,7 @@ setup(
     author_email='henning.jacobs@zalando.de',
     url='https://github.com/zalando-stups/python-tokens',
     license='Apache License Version 2.0',
+    setup_requires=['flake8'],
     install_requires=['requests'],
     tests_require=['pytest-cov', 'pytest'],
     cmdclass={'test': PyTest},
