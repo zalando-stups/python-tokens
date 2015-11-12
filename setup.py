@@ -20,15 +20,20 @@ __version__ = read_version('tokens')
 
 class PyTest(TestCommand):
 
+    user_options = [('cov-html=', None, 'Generate junit html report')]
+
     def initialize_options(self):
         TestCommand.initialize_options(self)
         self.cov = None
         self.pytest_args = ['--cov', 'tokens', '--cov-report', 'term-missing']
+        self.cov_html = False
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
+        if self.cov_html:
+            self.pytest_args.extend(['--cov-report', 'html'])
 
     def run_tests(self):
         import pytest
