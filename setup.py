@@ -51,7 +51,7 @@ setup(
     license='Apache License Version 2.0',
     setup_requires=['flake8'],
     install_requires=['requests'],
-    tests_require=['pytest-cov', 'pytest'],
+    tests_require=['pytest-cov', 'pytest', 'mock'],
     cmdclass={'test': PyTest},
     test_suite='tests',
     classifiers=[

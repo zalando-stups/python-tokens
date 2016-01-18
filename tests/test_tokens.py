@@ -3,7 +3,7 @@ import os
 import pytest
 import time
 import tokens
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 def test_get():
     tokens.TOKENS = {'test': {'access_token': 'mytok123',
