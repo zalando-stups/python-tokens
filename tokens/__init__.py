@@ -125,6 +125,7 @@ def get(token_name):
     if not access_token or time.time() > token['expires_at'] - REFRESH_BEFORE_SECS_LEFT:
         try:
             token = refresh(token_name)
+            access_token = token.get('access_token')
         except Exception as e:
             if access_token and time.time() < token['expires_at'] + EXPIRATION_TOLERANCE_SECS:
                 # apply some tolerance, still try our old token if it's still valid
@@ -132,5 +133,4 @@ def get(token_name):
             else:
                 raise
 
-    access_token = token.get('access_token')
     return access_token
