@@ -9,6 +9,9 @@ __version__ = '0.8'
 logger = logging.getLogger('tokens')
 
 ONE_YEAR = 3600*24*365
+EXPIRATION_TOLERANCE_SECS = 60
+# TODO: make time value configurable (20 minutes)?
+REFRESH_BEFORE_SECS_LEFT = 20 * 60
 
 CONFIG = {'url': os.environ.get('OAUTH2_ACCESS_TOKEN_URL', os.environ.get('OAUTH_ACCESS_TOKEN_URL')),
           'dir': os.environ.get('CREDENTIALS_DIR', '')}
@@ -30,6 +33,14 @@ class InvalidCredentialsError(Exception):
 
     def __str__(self):
         return 'Invalid OAuth credentials: {}'.format(self.msg)
+
+
+class InvalidTokenResponse(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return 'Invalid token response: {}'.format(self.msg)
 
 
 def init_fixed_tokens_from_env():
@@ -96,19 +107,30 @@ def refresh(token_name):
 
     r = requests.post(url, data=body, auth=auth)
     r.raise_for_status()
-    data = r.json()
-    token['data'] = data
-    token['expires_at'] = time.time() + data.get('expires_in')
-    token['access_token'] = data.get('access_token')
+    try:
+        data = r.json()
+        token['data'] = data
+        token['expires_at'] = time.time() + data['expires_in']
+        token['access_token'] = data['access_token']
+    except Exception as e:
+        raise InvalidTokenResponse('Expected a JSON object with keys "expires_in" and "access_token": {}'.format(e))
+    if not token['access_token']:
+        raise InvalidTokenResponse('Empty "access_token" value')
     return token
 
 
 def get(token_name):
     token = TOKENS[token_name]
     access_token = token.get('access_token')
-    # TODO: remove hardcoded time value (20 minutes)
-    if not access_token or time.time() > token['expires_at'] - 20*60:
-        token = refresh(token_name)
+    if not access_token or time.time() > token['expires_at'] - REFRESH_BEFORE_SECS_LEFT:
+        try:
+            token = refresh(token_name)
+            access_token = token.get('access_token')
+        except Exception as e:
+            if access_token and time.time() < token['expires_at'] + EXPIRATION_TOLERANCE_SECS:
+                # apply some tolerance, still try our old token if it's still valid
+                logger.warn('Failed to refresh access token "%s" (but it is still valid): %s', token_name, e)
+            else:
+                raise
 
-    access_token = token.get('access_token')
     return access_token
