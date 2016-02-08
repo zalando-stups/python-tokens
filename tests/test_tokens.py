@@ -138,8 +138,35 @@ def test_get_refresh_failure(monkeypatch, tmpdir):
     assert tok == 'oldtok'
     logger.warn.assert_called_with('Failed to refresh access token "%s" (but it is still valid): %s', 'mytok', exc)
 
-    tokens.TOKENS = {'mytok': {'scopes': ['myscope']}}
+    tokens.TOKENS = {'mytok': {'scopes': ['myscope'], 'expires_at': 0}}
     with pytest.raises(Exception) as exc_info:
         tok = tokens.get('mytok')
     assert exc_info.value == exc
 
+def test_get_refresh_failure_ignore_expire(monkeypatch, tmpdir):
+    tokens.configure(dir=str(tmpdir), url='https://example.org')
+
+    with open(os.path.join(str(tmpdir), 'user.json'), 'w') as fd:
+        json.dump({'application_username': 'app', 'application_password': 'pass'}, fd)
+
+    with open(os.path.join(str(tmpdir), 'client.json'), 'w') as fd:
+        json.dump({'client_id': 'cid', 'client_secret': 'sec'}, fd)
+
+    exc = Exception('FAIL')
+    response = MagicMock()
+    response.raise_for_status.side_effect = exc
+    monkeypatch.setattr('requests.post', lambda url, **kwargs: response)
+    logger = MagicMock()
+    monkeypatch.setattr('tokens.logger', logger)
+    tokens.TOKENS = {'mytok': {'access_token': 'oldtok',
+                              'ignore_expire': False,
+                              'scopes': ['myscope'],
+                              # token is still valid for 10 minutes
+                              'expires_at': time.time() + (10 * 60)}}
+    tok = tokens.get('mytok')
+    assert tok == 'oldtok'
+    logger.warn.assert_called_with('Failed to refresh access token "%s" (but it is still valid): %s', 'mytok', exc)
+
+    tokens.TOKENS = {'mytok': {'access_token':'expired-token', 'ignore_expire': True, 'scopes': ['myscope'], 'expires_at': 0}}
+    tok = tokens.get('mytok')
+    assert tok == 'expired-token'
