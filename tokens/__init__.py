@@ -55,7 +55,7 @@ def configure(**kwargs):
     CONFIG.update(kwargs)
 
 
-def manage(token_name, scopes, ignore_expire = False):
+def manage(token_name, scopes, ignore_expire=False):
     """ ignore_expire will enable using expired tokens in get()
         in cases where you token service does not yield a new token """
     TOKENS[token_name] = {'scopes': scopes, 'ignore_expire': ignore_expire}
