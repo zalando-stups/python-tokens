@@ -132,7 +132,7 @@ def get(token_name):
             if access_token and time.time() < token['expires_at'] + EXPIRATION_TOLERANCE_SECS:
                 # apply some tolerance, still try our old token if it's still valid
                 logger.warn('Failed to refresh access token "%s" (but it is still valid): %s', token_name, e)
-            elif token.get('ignore_expiration'):
+            elif access_token and token.get('ignore_expiration'):
                 logger.warn('Failed to refresh access token "%s" (ignoring expiration): %s', token_name, e)
             else:
                 raise
