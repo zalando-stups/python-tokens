@@ -12,9 +12,13 @@ ONE_YEAR = 3600*24*365
 EXPIRATION_TOLERANCE_SECS = 60
 # TODO: make time value configurable (20 minutes)?
 REFRESH_BEFORE_SECS_LEFT = 20 * 60
+DEFAULT_HTTP_CONNECT_TIMEOUT = 1.25
+DEFAULT_HTTP_SOCKET_TIMEOUT = 2.25
 
 CONFIG = {'url': os.environ.get('OAUTH2_ACCESS_TOKEN_URL', os.environ.get('OAUTH_ACCESS_TOKEN_URL')),
-          'dir': os.environ.get('CREDENTIALS_DIR', '')}
+          'dir': os.environ.get('CREDENTIALS_DIR', ''),
+          'connect_timeout': DEFAULT_HTTP_CONNECT_TIMEOUT,
+          'socket_timeout': DEFAULT_HTTP_SOCKET_TIMEOUT}
 
 TOKENS = {}
 
@@ -90,6 +94,8 @@ def refresh(token_name):
     token = TOKENS[token_name]
     path = CONFIG['dir']
     url = CONFIG['url']
+    # http://requests.readthedocs.org/en/master/user/advanced/#timeouts
+    request_timeout = CONFIG['connect_timeout'], CONFIG['socket_timeout']
 
     if not url:
         raise ConfigurationError('Missing OAuth access token URL. ' +
@@ -107,7 +113,7 @@ def refresh(token_name):
     except KeyError as e:
         raise InvalidCredentialsError('Missing key: {}'.format(e))
 
-    r = requests.post(url, data=body, auth=auth)
+    r = requests.post(url, data=body, auth=auth, timeout=request_timeout)
     r.raise_for_status()
     try:
         data = r.json()

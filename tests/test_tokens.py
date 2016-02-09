@@ -102,12 +102,19 @@ def test_refresh_invalid_response(monkeypatch, tmpdir):
 
     response = MagicMock()
     response.json.return_value = {'foo': 'bar'}
-    monkeypatch.setattr('requests.post', lambda url, **kwargs: response)
+    post = MagicMock()
+    post.return_value = response
+    monkeypatch.setattr('requests.post', post)
     monkeypatch.setattr('tokens.read_credentials', lambda path: (VALID_USER_JSON, VALID_CLIENT_JSON))
 
     with pytest.raises(tokens.InvalidTokenResponse) as exc_info:
         tokens.get('mytok')
     assert str(exc_info.value) == """Invalid token response: Expected a JSON object with keys "expires_in" and "access_token": 'expires_in'"""
+
+    # verify that we use a proper HTTP timeout..
+    post.assert_called_with('https://example.org',
+                            data={'username': 'app', 'scope': 'myscope', 'password': 'pass', 'grant_type': 'password'},
+                            timeout=(1.25, 2.25), auth=('cid', 'sec'))
 
     response.json.return_value = {'access_token': '', 'expires_in': 100}
     with pytest.raises(tokens.InvalidTokenResponse) as exc_info:
