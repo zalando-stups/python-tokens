@@ -55,10 +55,10 @@ def configure(**kwargs):
     CONFIG.update(kwargs)
 
 
-def manage(token_name, scopes, ignore_expire=False):
-    """ ignore_expire will enable using expired tokens in get()
+def manage(token_name, scopes, ignore_expiration=False):
+    """ ignore_expiration will enable using expired tokens in get()
         in cases where you token service does not yield a new token """
-    TOKENS[token_name] = {'scopes': scopes, 'ignore_expire': ignore_expire}
+    TOKENS[token_name] = {'scopes': scopes, 'ignore_expiration': ignore_expiration}
     init_fixed_tokens_from_env()
 
 
@@ -132,8 +132,9 @@ def get(token_name):
             if access_token and time.time() < token['expires_at'] + EXPIRATION_TOLERANCE_SECS:
                 # apply some tolerance, still try our old token if it's still valid
                 logger.warn('Failed to refresh access token "%s" (but it is still valid): %s', token_name, e)
+            elif token.get('ignore_expiration'):
+                logger.warn('Failed to refresh access token "%s" (ignoring expiration): %s', token_name, e)
             else:
-                if not token.get('ignore_expire', False):
-                    raise
+                raise
 
     return access_token
