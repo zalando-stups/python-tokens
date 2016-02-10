@@ -114,6 +114,7 @@ def test_refresh_invalid_response(monkeypatch, tmpdir):
     # verify that we use a proper HTTP timeout..
     post.assert_called_with('https://example.org',
                             data={'username': 'app', 'scope': 'myscope', 'password': 'pass', 'grant_type': 'password'},
+                            headers={'User-Agent': 'python-tokens/{}'.format(tokens.__version__)},
                             timeout=(1.25, 2.25), auth=('cid', 'sec'))
 
     response.json.return_value = {'access_token': '', 'expires_in': 100}

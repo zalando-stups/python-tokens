@@ -113,7 +113,9 @@ def refresh(token_name):
     except KeyError as e:
         raise InvalidCredentialsError('Missing key: {}'.format(e))
 
-    r = requests.post(url, data=body, auth=auth, timeout=request_timeout)
+    headers = {'User-Agent': 'python-tokens/{}'.format(__version__)}
+
+    r = requests.post(url, data=body, auth=auth, timeout=request_timeout, headers=headers)
     r.raise_for_status()
     try:
         data = r.json()
