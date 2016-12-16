@@ -205,6 +205,13 @@ def test_read_from_file(monkeypatch, tmpdir):
     with open(os.path.join(str(tmpdir), 'mytok-secret'), 'w') as fd:
         fd.write('my-access-token\n')
     tokens.manage('mytok')
-    print(tokens.TOKENS)
     tok = tokens.get('mytok')
     assert tok == 'my-access-token'
+
+
+def test_read_from_file_fail(monkeypatch, tmpdir):
+    tokens.configure(dir=str(tmpdir), from_file_only=True)
+    tokens.manage('mytok')
+    with pytest.raises(tokens.InvalidCredentialsError) as exc_info:
+        tokens.get('mytok')
+    assert str(exc_info.value) == 'Invalid OAuth credentials: Failed to read token "mytok" from {}.'.format(str(tmpdir))

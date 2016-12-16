@@ -17,6 +17,7 @@ DEFAULT_HTTP_SOCKET_TIMEOUT = 2.25
 
 CONFIG = {'url': os.environ.get('OAUTH2_ACCESS_TOKEN_URL', os.environ.get('OAUTH_ACCESS_TOKEN_URL')),
           'dir': os.environ.get('CREDENTIALS_DIR', ''),
+          'from_file_only': False,
           'connect_timeout': DEFAULT_HTTP_CONNECT_TIMEOUT,
           'socket_timeout': DEFAULT_HTTP_SOCKET_TIMEOUT}
 
@@ -113,6 +114,8 @@ def refresh(token_name):
     if token_from_file:
         token.update(**token_from_file)
         return token
+    elif CONFIG['from_file_only']:
+        raise InvalidCredentialsError('Failed to read token "{}" from {}.'.format(token_name, path))
 
     url = CONFIG['url']
     # http://requests.readthedocs.org/en/master/user/advanced/#timeouts

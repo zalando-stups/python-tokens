@@ -62,6 +62,7 @@ This library also allows reading tokens directly from a file. The token needs to
     import tokens
 
     # the environment variable CREDENTIALS_DIR must be set correctly
+    tokens.configure(from_file_only=True)
     tokens.manage('full-access')
     tok = tokens.get('full-access')
 
