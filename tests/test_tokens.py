@@ -32,13 +32,13 @@ def test_read_credentials(tmpdir):
     with open(os.path.join(path, 'client.json'), 'w') as fd:
         fd.write('invalid')
 
-    with pytest.raises(tokens.InvalidCredentialsError) as exc_info:
+    with pytest.raises(tokens.InvalidCredentialsError):
         tokens.read_credentials(path)
 
     with open(os.path.join(path, 'user.json'), 'w') as fd:
         fd.write('invalid')
 
-    with pytest.raises(tokens.InvalidCredentialsError) as exc_info:
+    with pytest.raises(tokens.InvalidCredentialsError):
         tokens.read_credentials(path)
 
 
@@ -171,7 +171,7 @@ def test_get_refresh_failure_ignore_expiration_no_access_token(monkeypatch, tmpd
                               # expired a long time ago..
                               'expires_at': 0}}
     with pytest.raises(Exception) as exc_info:
-        tok = tokens.get('mytok')
+        tokens.get('mytok')
     assert exc_info.value == exc
 
 
