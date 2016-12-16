@@ -1,3 +1,4 @@
+import errno
 import json
 import logging
 import os
@@ -95,8 +96,11 @@ def read_token_from_file(path, token_name):
     try:
         with open(file_path) as fd:
             access_token = fd.read().strip()
-    except FileNotFoundError as e:
-        pass
+    except IOError as e:
+        if e.errno == errno.ENOENT:
+            pass
+        else:
+            raise
     else:
         token = {
             'access_token': access_token,
