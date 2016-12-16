@@ -201,7 +201,7 @@ def test_get_refresh_failure_ignore_expiration(monkeypatch, tmpdir):
 
 
 def test_read_from_file(monkeypatch, tmpdir):
-    tokens.configure(dir=str(tmpdir), url='https://example.org')
+    tokens.configure(dir=str(tmpdir))
     with open(os.path.join(str(tmpdir), 'mytok-secret'), 'w') as fd:
         fd.write('my-access-token\n')
     tokens.manage('mytok')
