@@ -198,3 +198,13 @@ def test_get_refresh_failure_ignore_expiration(monkeypatch, tmpdir):
     tok = tokens.get('mytok')
     assert tok == 'expired-token'
     logger.warn.assert_called_with('Failed to refresh access token "%s" (ignoring expiration): %s', 'mytok', exc)
+
+
+def test_read_from_file(monkeypatch, tmpdir):
+    tokens.configure(dir=str(tmpdir), url='https://example.org')
+    with open(os.path.join(str(tmpdir), 'mytok-secret'), 'w') as fd:
+        fd.write('my-access-token\n')
+    tokens.manage('mytok')
+    print(tokens.TOKENS)
+    tok = tokens.get('mytok')
+    assert tok == 'my-access-token'

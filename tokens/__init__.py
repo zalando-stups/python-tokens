@@ -59,10 +59,10 @@ def configure(**kwargs):
     CONFIG.update(kwargs)
 
 
-def manage(token_name, scopes, ignore_expiration=False):
+def manage(token_name, scopes=None, ignore_expiration=False):
     """ ignore_expiration will enable using expired tokens in get()
         in cases where you token service does not yield a new token """
-    TOKENS[token_name] = {'scopes': scopes, 'ignore_expiration': ignore_expiration}
+    TOKENS[token_name] = {'scopes': scopes or [], 'ignore_expiration': ignore_expiration}
     init_fixed_tokens_from_env()
 
 
@@ -89,10 +89,31 @@ def read_credentials(path):
     return user_data, client_data
 
 
+def read_token_from_file(path, token_name):
+    file_path = os.path.join(path, '{}-secret'.format(token_name))
+    try:
+        with open(file_path) as fd:
+            access_token = fd.read().strip()
+    except FileNotFoundError as e:
+        pass
+    else:
+        token = {
+            'access_token': access_token,
+            'expires_at': time.time() + 120
+        }
+        return token
+
+
 def refresh(token_name):
     logger.info('Refreshing access token "%s"..', token_name)
     token = TOKENS[token_name]
     path = CONFIG['dir']
+    token_from_file = read_token_from_file(path, token_name)
+
+    if token_from_file:
+        token.update(**token_from_file)
+        return token
+
     url = CONFIG['url']
     # http://requests.readthedocs.org/en/master/user/advanced/#timeouts
     request_timeout = CONFIG['connect_timeout'], CONFIG['socket_timeout']
