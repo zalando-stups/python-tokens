@@ -32,13 +32,13 @@ def test_read_credentials(tmpdir):
     with open(os.path.join(path, 'client.json'), 'w') as fd:
         fd.write('invalid')
 
-    with pytest.raises(tokens.InvalidCredentialsError) as exc_info:
+    with pytest.raises(tokens.InvalidCredentialsError):
         tokens.read_credentials(path)
 
     with open(os.path.join(path, 'user.json'), 'w') as fd:
         fd.write('invalid')
 
-    with pytest.raises(tokens.InvalidCredentialsError) as exc_info:
+    with pytest.raises(tokens.InvalidCredentialsError):
         tokens.read_credentials(path)
 
 
@@ -171,7 +171,7 @@ def test_get_refresh_failure_ignore_expiration_no_access_token(monkeypatch, tmpd
                               # expired a long time ago..
                               'expires_at': 0}}
     with pytest.raises(Exception) as exc_info:
-        tok = tokens.get('mytok')
+        tokens.get('mytok')
     assert exc_info.value == exc
 
 
@@ -198,3 +198,28 @@ def test_get_refresh_failure_ignore_expiration(monkeypatch, tmpdir):
     tok = tokens.get('mytok')
     assert tok == 'expired-token'
     logger.warn.assert_called_with('Failed to refresh access token "%s" (ignoring expiration): %s', 'mytok', exc)
+
+
+def test_read_from_file(monkeypatch, tmpdir):
+    tokens.configure(dir=str(tmpdir))
+    with open(os.path.join(str(tmpdir), 'mytok-secret'), 'w') as fd:
+        fd.write('my-access-token\n')
+    tokens.manage('mytok')
+    tok = tokens.get('mytok')
+    assert tok == 'my-access-token'
+
+
+def test_read_from_file_fail(monkeypatch, tmpdir):
+    tokens.configure(dir=str(tmpdir), from_file_only=True)
+    tokens.manage('mytok')
+    with pytest.raises(tokens.InvalidCredentialsError) as exc_info:
+        tokens.get('mytok')
+    assert str(exc_info.value) == 'Invalid OAuth credentials: Failed to read token "mytok" from {}.'.format(str(tmpdir))
+
+
+def test_read_from_file_fail_raise(monkeypatch, tmpdir):
+    tokens.configure(dir=str(tmpdir))
+    os.mkdir(os.path.join(str(tmpdir), 'mytok-secret'))
+    tokens.manage('mytok')
+    with pytest.raises(IOError) as exc_info:
+        tokens.get('mytok')
