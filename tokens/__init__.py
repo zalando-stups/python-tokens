@@ -92,7 +92,7 @@ def read_credentials(path):
 
 
 def read_token_from_file(path, token_name):
-    file_path = os.path.join(path, '{}-secret'.format(token_name))
+    file_path = os.path.join(path, '{}-token-secret'.format(token_name))
     try:
         with open(file_path) as fd:
             access_token = fd.read().strip()
@@ -110,7 +110,6 @@ def read_token_from_file(path, token_name):
 
 
 def refresh(token_name):
-    logger.info('Refreshing access token "%s"..', token_name)
     token = TOKENS[token_name]
     path = CONFIG['dir']
     token_from_file = read_token_from_file(path, token_name)
@@ -121,6 +120,7 @@ def refresh(token_name):
     elif CONFIG['from_file_only']:
         raise InvalidCredentialsError('Failed to read token "{}" from {}.'.format(token_name, path))
 
+    logger.info('Refreshing access token "%s"..', token_name)
     url = CONFIG['url']
     # http://requests.readthedocs.org/en/master/user/advanced/#timeouts
     request_timeout = CONFIG['connect_timeout'], CONFIG['socket_timeout']
