@@ -92,7 +92,7 @@ def read_credentials(path):
 
 
 def read_token_from_file(path, token_name):
-    file_path = os.path.join(path, '{}-secret'.format(token_name))
+    file_path = os.path.join(path, '{}-token-secret'.format(token_name))
     try:
         with open(file_path) as fd:
             access_token = fd.read().strip()

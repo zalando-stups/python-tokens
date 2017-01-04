@@ -219,7 +219,7 @@ def test_read_from_file_fail(monkeypatch, tmpdir):
 
 def test_read_from_file_fail_raise(monkeypatch, tmpdir):
     tokens.configure(dir=str(tmpdir))
-    os.mkdir(os.path.join(str(tmpdir), 'mytok-secret'))
+    os.mkdir(os.path.join(str(tmpdir), 'mytok-token-secret'))
     tokens.manage('mytok')
     with pytest.raises(IOError) as exc_info:
         tokens.get('mytok')
