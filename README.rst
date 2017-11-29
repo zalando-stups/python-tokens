@@ -10,10 +10,6 @@ Python Tokens
    :target: https://coveralls.io/r/zalando-stups/python-tokens
    :alt: Code Coverage
 
-.. image:: https://img.shields.io/pypi/dw/stups-tokens.svg
-   :target: https://pypi.python.org/pypi/stups-tokens/
-   :alt: PyPI Downloads
-
 .. image:: https://img.shields.io/pypi/v/stups-tokens.svg
    :target: https://pypi.python.org/pypi/stups-tokens/
    :alt: Latest PyPI version
