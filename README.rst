@@ -51,7 +51,7 @@ Usage
     tok = tokens.get('example') # will refresh the expired token
     requests.get('https://example.org/', headers={'Authorization': 'Bearer {}'.format(tok)})
 
-This library also allows reading tokens directly from a file. The token needs to be in a file name ``${CREDENTIALS_DIR}/${TOKEN_NAME}-secret``:
+This library also allows reading tokens directly from a file. The token needs to be in a file name ``${CREDENTIALS_DIR}/${TOKEN_NAME}-token-secret``:
 
 .. code-block:: python
 
